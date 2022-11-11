@@ -1,0 +1,19 @@
+$productCatalog=myclothstoreProductCatalog
+ 
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+ 
+# Language
+$lang=en
+ 
+UPDATE Product;$catalogVersion;code[unique=true];name[lang=$lang];summary[lang=$lang];description[lang=$lang]
+;;0001;Nike_men; cloths;This is a Nike brand cloths for men
+;;0001;Reebok_men;cloths;This is a Reebok brand cloths for men
+;;0001;Puma_men;cloths;This is a Nike brand cloths for men
+
+;;0100;Nike_women;cloths;This is a Nike brandcloths for women
+;;0101;Reebok_women;cloths;This is a Reebok brand cloths for women
+;;0102;Puma_women;cloths;This is a Puma brand cloths for women
+
+;;0200;Nike_kids;cloths;This is a Nike brand cloths for kids
+;;0201;Reebok_kids;cloths;This is a Reebok brand cloths for kids
+;;0202;Puma_kids;cloths;This is a Puma brand cloths for kids

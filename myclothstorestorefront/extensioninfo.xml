@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+                    	
+    
+    
+    
+    
+    <extension abstractclassprefix="Generated" classprefix="MyclothstoreStorefront" name="myclothstorestorefront" usemaven="false">
+                                        		
+        
+        
+        
+        
+        
+        <requires-extension name="captchaaddon"/>
+        <requires-extension name="pcmbackofficesamplesaddon"/>
+                        
+        
+        <requires-extension name="smarteditaddon"/>
+                                
+        
+        
+        <requires-extension name="acceleratorstorefrontcommons"/>
+                                        		
+        
+        
+        
+        
+        <requires-extension name="myclothstorefacades"/>
+                                        		
+        
+        
+        
+        
+        <webmodule jspcompile="false" webroot="/myclothstorestorefront"/>
+                                        		
+        
+        
+        
+                        		
+        
+        
+        
+        
+        <meta key="extgen-template-extension" value="true"/>
+                                        	
+    
+    
+    
+    
+    </extension>
+                    
+
+
+
+
+</extensioninfo>

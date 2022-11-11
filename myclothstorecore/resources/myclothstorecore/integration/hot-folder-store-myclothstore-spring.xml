@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration 
+	http://www.springframework.org/schema/integration/spring-integration.xsd
+	http://www.springframework.org/schema/integration/file 
+	http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/> 
+
+	<bean id="baseDirectoryApparel" class="java.lang.String">
+		<constructor-arg value="#{baseDirectory}/${tenantId}/hotfolder" />
+	</bean>
+	<!-- 1) Scan for files -->
+	<file:inbound-channel-adapter id="batchFilesHotfolder" directory="#{baseDirectoryHotfolder}" 
+	filename-regex="^(.*)-(\d+)\.csv" comparator="fileOrderComparator"> 
+	<int:poller fixed-rate="1000" /> 
+	</file:inbound-channel-adapter> 
+	
+	<!-- 2) move the file to processing and create header -->
+	<file:outbound-gateway request-channel="batchFilesHotfolder" reply-channel="batchFilesHotfolderProc"
+	directory="#{baseDirectoryHotfolder}/processing" delete-source-files="true" />
+	<int:service-activator input-channel="batchFilesHotfolderProc" output-channel="batchFilesHeaderInit" ref="hotfolderHeaderSetupTask" method="execute" /> <bean id="hotfolderHeaderSetupTask" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.HeaderSetupTask"> <property name="catalog" value="electronicsProductCatalog" /> 
+	<property name="net" value="false" />
+	<property name="storeBaseDirectory" ref="baseDirectoryHotfolder" /> 
+	</bean>
+	
+	<bean id="myclothstoreProductConverterMapping" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" p:mapping="product" p:converter-ref="myclothstoreProductConverter" />
+
+<bean id="myclothstoreProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+ <property name="header"> 
+ <value>
+$productCatalog=myclothstoreProductCatalog
+   
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default='$productCatalog:Staged']
+$prices=Europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+   
+# Set product approval status to Approved only for those products that have prices.
+$approved=approvalstatus(code)[default='approved']
+  
+UPDATE Product;code[unique=true];$prices;$approved;$catalogVersion;
+ </value> 
+ </property> 
+ <property name="impexRow"> 
+ <value>;{+0};{1};{2};{3}</value>
+</property>
+		<property name="rowFilter">
+			<bean class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexRowFilter">
+				<property name="expression" value="row[2] == 'ApparelStyleVariantProduct' || (!row[2] &amp;&amp; !row[4])"/>
+			</bean>
+		</property>
+	</bean>
+
+</beans>
